@@ -51,7 +51,6 @@ def share_snapshots(client, snapshots, TargetAccount, DryRun=True):
                                                DryRun = DryRun)
         res_lst.append(res)
 
-
     return res_lst
 
 

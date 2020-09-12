@@ -8,7 +8,7 @@ from botocore.exceptions import ClientError
 #logger = logging.getLogger(__name__)
 #ec2 = boto3.resource('ec2')
 
-def copy_amis(client, lst, KmsKeyId, DryRun=True):
+def copy_amis(client, lst, name_prefix, KmsKeyId, DryRun=True):
 
     res_lst = []
     #pprint.pprint(lst)
@@ -18,7 +18,7 @@ def copy_amis(client, lst, KmsKeyId, DryRun=True):
         description = tags["Name"]
         encrypted = True
         kms_key_id = KmsKeyId
-        name = "SHARED " + tags["Name"]
+        name = name_prefix + tags["Name"]
         source_image_id = elt[2]
         source_region = 'us-east-1'
 
@@ -48,7 +48,9 @@ def main():
 
     #pprint.pprint(vars['KmsKeyId'])
 
-    copied_amis = copy_amis(client, lst, DryRun=False,
+    copied_amis = copy_amis(client, lst,
+                            vars["EcsSharedPrefix"],
+                            DryRun=False,
                             KmsKeyId=vars['SourceKmsKeyId'])
 
     with open('input/copied_amis.txt', 'w') as outfile:

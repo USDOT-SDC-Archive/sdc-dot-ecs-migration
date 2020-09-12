@@ -18,7 +18,7 @@ def copy_target_amis(client, lst, KmsKeyId, DryRun=True):
         description = tags["Name"]
         encrypted = True
         kms_key_id = KmsKeyId
-        name = "SHARED " + tags["Name"]
+        name = "ECS_RESTORED " + tags["Name"]
         source_image_id = elt[3]
         source_region = 'us-east-1'
 
@@ -48,7 +48,7 @@ def main():
 
     #pprint.pprint(vars['KmsKeyId'])
 
-    copied_amis = copy_target_amis(client, lst, DryRun=True,
+    copied_amis = copy_target_amis(client, lst, DryRun=False,
                             KmsKeyId=vars['TargetKmsKeyId'])
 
     with open('input/copied_target_amis.txt', 'w') as outfile:
