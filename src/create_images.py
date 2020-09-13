@@ -58,7 +58,7 @@ def create_amis(client, lst, name_prefix, DryRun=True, NoReboot=True):
         tags = elt[1]
         description = tags["Name"]
         instance_id = elt[0]
-        name = name_prefix + tags["Name"]
+        name = name_prefix + " " + instance_id + " " + tags["Name"]
         no_reboot = NoReboot
 
         res = client.create_image(Description = description,

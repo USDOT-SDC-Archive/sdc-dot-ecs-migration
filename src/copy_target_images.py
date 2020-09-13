@@ -18,7 +18,7 @@ def copy_target_amis(client, lst, KmsKeyId, DryRun=True):
         description = tags["Name"]
         encrypted = True
         kms_key_id = KmsKeyId
-        name = "ECS_RESTORED " + tags["Name"]
+        name = "ECS_RESTORED " + " " + instance_id + " " + tags["Name"]
         source_image_id = elt[3]
         source_region = 'us-east-1'
 
