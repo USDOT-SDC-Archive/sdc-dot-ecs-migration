@@ -1,23 +1,25 @@
 # sdc-dot-ecs-migration
 
 # README Outline:
-* Project Description
-* Prerequisites
-* Usage
-	* Building
-	* Testing
-	* Execution
-* Additional Notes
-* Version History and Retention
-* License
-* Contributions
-* Contact Information
-* Acknowledgements
+* [Project Description](#project_description)
+* [Prerequisites](#prerequisites)
+* [Usage](#usage)
+	* [Building](#usage_building)
+	* [Testing](#usage_testing)
+	* [Execution](#usage_execution)
+* [Additional Notes](#additional_notes)
+* [Version History and Retention](#version_history)
+* [License](#license)
+* [Contributions](#contributions)
+* [Contact Information](#contact_information)
+* [Acknowledgements](#acknowledgements)
 
+<a name="project_description"/>
 # Project Description
 
 This repository contains tools and documentation to aid with migration of the Secure Data Commons resources from external Amazon Web Services (AWS) account to the USDOT Enterprise Cloud Services (ECS) environment.
 
+<a name="prerequisites"/>
 # Prerequisites
 
 Requires:
@@ -27,14 +29,18 @@ Requires:
 
 The preferred environment for execution is Linux - but will work in Windows as well if you have corresponding utilities installed.
 
+<a name="usage"/>
 # Usage
 
+<a name="usage_building"/>
 ## Building
 As this is Python-based code, there are no build requirements. 
 
+<a name="usage_testing"/>
 ## Testing
 There are no unit tests at this time. Manual testing will need to be conducted for each specific workstation after migration.
 
+<a name="usage_execution"/>
 ## Execution
 All source code files are located into the "src" folder. Follow the steps below after downloading the source code.
 
@@ -131,7 +137,7 @@ python copy_target_images.py
 python launch_target_instances.py
 ```
 
-
+<a name="version_history"/>
 # Version History and Retention
 
 **Status:** This project is in the release/active development phase.
@@ -142,16 +148,20 @@ python launch_target_instances.py
 
 **Retention:** This project will remain publicly accessible for a minimum of five years (until at least 06/15/2025).
 
+<a name="license"/>
 # License
 This project is licensed under the MIT License - see the [License.MD](https://github.com/usdot-jpo-sdc-projects/sdc-dot-ecs-migration/blob/master/LICENSE) for more details. 
 
+<a name="contributions"/>
 # Contributions
 Please read [CONTRIBUTING.md](https://github.com/usdot-jpo-sdc-projects/sdc-dot-ecs-migration/blob/master/Contributing.MD) for details on our Code of Conduct, the process for submitting pull requests to us, and how contributions will be released.
 
+<a name="contact_information"/>
 # Contact Information
 Contact Name: USDOT ITS JPO Secure Data Commons
 Contact Information: sdc-support@dot.gov
 
+<a name="acknowledgments"/>
 # Acknowledgements
 To track how this government-funded code is used, we request that if you decide to build additional software using this code please acknowledge its Digital Object Identifier in your software's README/documentation.
 
