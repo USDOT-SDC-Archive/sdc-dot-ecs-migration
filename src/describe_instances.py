@@ -47,7 +47,8 @@ def main():
     #pprint.pprint(instances)
 
     for i in instances:
-        s = i["InstanceId"] + " --> " + json.dumps(i["State"])
+        tags = awsutils.get_instance_tags(i)
+        s = i["InstanceId"] + " --> " + tags["OS"] + " --> " + json.dumps(i["State"]["Name"])
         pprint.pprint(s)
 
 
