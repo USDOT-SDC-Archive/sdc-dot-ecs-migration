@@ -5,13 +5,12 @@ import json
 import awsutils
 from botocore.exceptions import ClientError
 
-#logger = logging.getLogger(__name__)
-#ec2 = boto3.resource('ec2')
 
-def copy_target_amis(client, lst, KmsKeyId, DryRun=True):
+def copy_target_amis(client, lst, KmsKeyId, waitForCompletion=False, DryRun=True):
 
     res_lst = []
-    #pprint.pprint(lst)
+    amis = []
+
     for elt in lst:
         instance_id = elt[0]
         tags = elt[1]
@@ -34,12 +33,17 @@ def copy_target_amis(client, lst, KmsKeyId, DryRun=True):
         pprint.pprint(ami_id)
 
         res_lst.append((elt[0], elt[1], elt[2], elt[3], ami_id))
+        amis.append(ami_id)
+
+    if waitForCompletion:
+        awsutils.wait_for_ami_completion(client, amis)
 
     return res_lst
 
 
 # main
-def main():
+def main(waitForCompletion = False):
+    pprint.pprint("Entering copy_target_images.main()")
     vars = awsutils.read_vars()
     client = awsutils.get_ec2_client('us-east-1')
 
@@ -48,11 +52,16 @@ def main():
 
     #pprint.pprint(vars['KmsKeyId'])
 
-    copied_amis = copy_target_amis(client, lst, DryRun=False,
-                            KmsKeyId=vars['TargetKmsKeyId'])
+    copied_amis = copy_target_amis(client,
+                                   lst,
+                                   waitForCompletion = waitForCompletion,
+                                   KmsKeyId=vars['TargetKmsKeyId'],
+                                   DryRun=False)
 
     with open('input/copied_target_amis.txt', 'w') as outfile:
         json.dump(copied_amis, outfile, indent=4)
 
+    pprint.pprint("Leaving copy_target_images.main()")
 
-main()
+
+#main()

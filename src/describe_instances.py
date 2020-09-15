@@ -48,7 +48,8 @@ def main():
 
     for i in instances:
         tags = awsutils.get_instance_tags(i)
-        s = i["InstanceId"] + " --> " + tags["OS"] + " --> " + json.dumps(i["State"]["Name"])
+        s = i["InstanceId"] + " --> " + tags["OS"] + " | " + i["PrivateIpAddress"] + \
+            " --> " + json.dumps(i["State"]["Name"])
         pprint.pprint(s)
 
 

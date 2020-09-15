@@ -8,10 +8,11 @@ from botocore.exceptions import ClientError
 #logger = logging.getLogger(__name__)
 #ec2 = boto3.resource('ec2')
 
-def copy_amis(client, lst, name_prefix, KmsKeyId, DryRun=True):
+def copy_amis(client, lst, name_prefix, KmsKeyId, waitForCompletion=True, DryRun=True):
 
     res_lst = []
-    #pprint.pprint(lst)
+    amis = []
+
     for elt in lst:
         instance_id = elt[0]
         tags = elt[1]
@@ -21,7 +22,6 @@ def copy_amis(client, lst, name_prefix, KmsKeyId, DryRun=True):
         name = name_prefix + " " + instance_id + " " + tags["Name"]
         source_image_id = elt[2]
         source_region = 'us-east-1'
-
 
         res = client.copy_image(Description = description,
                                 Encrypted = encrypted,
@@ -34,12 +34,17 @@ def copy_amis(client, lst, name_prefix, KmsKeyId, DryRun=True):
         pprint.pprint(ami_id)
 
         res_lst.append((elt[0], elt[1], elt[2], ami_id))
+        amis.append(ami_id)
+
+    if waitForCompletion:
+        awsutils.wait_for_ami_completion(client, amis)
 
     return res_lst
 
 
 # main
-def main():
+def main(waitForCompletion = True):
+    pprint.pprint("Entering copy_images.main()")
     vars = awsutils.read_vars()
     client = awsutils.get_ec2_client('us-east-1')
 
@@ -50,11 +55,14 @@ def main():
 
     copied_amis = copy_amis(client, lst,
                             vars["EcsSharedPrefix"],
-                            DryRun=False,
-                            KmsKeyId=vars['SourceKmsKeyId'])
+                            waitForCompletion = waitForCompletion,
+                            KmsKeyId=vars['SourceKmsKeyId'],
+                            DryRun=False)
 
     with open('input/copied_amis.txt', 'w') as outfile:
         json.dump(copied_amis, outfile, indent=4)
 
+    pprint.pprint("Leaving copy_images.main()")
 
-main()
+
+#main()

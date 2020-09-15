@@ -2,11 +2,10 @@ import logging
 import pprint
 import boto3
 import json
+import time
 import awsutils
 from botocore.exceptions import ClientError
 
-#logger = logging.getLogger(__name__)
-#ec2 = boto3.resource('ec2')
 
 def get_instances(client, instance_ids):
     instances = client.describe_instances(InstanceIds=instance_ids)
@@ -50,9 +49,11 @@ def repackage_instances(instances):
     return lst
 
 
-def create_amis(client, lst, name_prefix, DryRun=True, NoReboot=True):
+def create_amis(client, lst, name_prefix, DryRun=True, waitForCompletion = False, NoReboot=True):
 
     res_lst = []
+    amis = []
+
     #pprint.pprint(lst)
     for elt in lst:
         tags = elt[1]
@@ -70,12 +71,17 @@ def create_amis(client, lst, name_prefix, DryRun=True, NoReboot=True):
         pprint.pprint(ami_id)
 
         res_lst.append((elt[0], elt[1], ami_id))
+        amis.append(ami_id)
+
+    if waitForCompletion:
+        awsutils.wait_for_ami_completion(client, amis)
 
     return res_lst
 
 
 # main
-def main():
+def main(waitForCompletion = True):
+    pprint.pprint("Entering create_images.main()")
     vars = awsutils.read_vars()
     client = awsutils.get_ec2_client('us-east-1')
 
@@ -89,10 +95,13 @@ def main():
 
     base_amis = create_amis(client, lst,
                             vars["EcsQuarantineCopiedPrefix"],
-                            DryRun=False, NoReboot=True)
+                            waitForCompletion = waitForCompletion,
+                            DryRun=False,
+                            NoReboot=True)
 
     with open('input/base_amis.txt', 'w') as outfile:
         json.dump(base_amis, outfile, indent=4)
 
+    pprint.pprint("Leaving create_images.main()")
 
-main()
+#main()

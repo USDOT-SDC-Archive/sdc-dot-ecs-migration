@@ -68,4 +68,4 @@ def main():
         json.dump(instances, outfile, indent=4)
 
 
-main()
+#main()

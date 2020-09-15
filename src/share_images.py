@@ -56,6 +56,7 @@ def share_snapshots(client, snapshots, TargetAccount, DryRun=True):
 
 # main
 def main():
+    pprint.pprint("Entering share_images.main()")
     vars = awsutils.read_vars()
     client = awsutils.get_ec2_client('us-east-1')
 
@@ -71,6 +72,7 @@ def main():
 
     res = share_snapshots(client, snapshots, vars['TargetAccount'], DryRun=False)
     pprint.pprint(res)
+    pprint.pprint("Leaving share_images.main()")
 
 
-main()
+#main()
