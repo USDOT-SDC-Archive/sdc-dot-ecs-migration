@@ -9,7 +9,7 @@ from botocore.exceptions import ClientError
 #ec2 = boto3.resource('ec2')
 
 def get_tag_specifications(dct, name_prefix):
-    dct["Name"] = "ECS_RESTORED " + dct["Name"]
+    dct["Name"] = name_prefix + dct["Name"]
     tags = []
     for k, v in dct.items():
         tags.append({ "Key": k, "Value": v })
@@ -47,6 +47,7 @@ def launch_ec2s(client, lst, name_prefix, key_name, security_group_ids, subnet_i
 
 # main
 def main():
+    pprint.pprint("Entering launch_target_instances.main()")
     vars = awsutils.read_vars()
     client = awsutils.get_ec2_client('us-east-1')
 
@@ -66,6 +67,8 @@ def main():
     pprint.pprint(instances)
     with open('input/launched_target_ec2s.txt', 'w') as outfile:
         json.dump(instances, outfile, indent=4)
+
+    pprint.pprint("Leaving launch_target_instances.main()")
 
 
 #main()
