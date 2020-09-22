@@ -23,8 +23,8 @@ def get_instance_tags(instance):
     return tags
 
 
-def read_vars():
-    with open('input/vars.txt') as infile:
+def read_vars(file = 'input/vars.txt'):
+    with open(file) as infile:
         vars = json.load(infile)
     return vars
 

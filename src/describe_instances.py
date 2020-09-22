@@ -34,6 +34,17 @@ def repackage_instances_as_dct(instances):
     return dct
 
 
+def list_roles():
+    instances = main()
+
+    for i in instances:
+        tags = awsutils.get_instance_tags(i)
+        s = i["IamInstanceProfile"]["Arn"].rpartition('/')[-1]
+        pprint.pprint(s)
+
+    return instances
+
+
 # main
 def main():
     vars = awsutils.read_vars()
@@ -44,13 +55,17 @@ def main():
         instance_ids = json.load(infile)
 
     instances = get_instances(client, instance_ids)
-    #pprint.pprint(instances)
+    pprint.pprint(instances)
 
     for i in instances:
         tags = awsutils.get_instance_tags(i)
         s = i["InstanceId"] + " --> " + tags["OS"] + " | " + i["PrivateIpAddress"] + \
-            " --> " + json.dumps(i["State"]["Name"])
+            " --> " + json.dumps(i["State"]["Name"]) + " | "
         pprint.pprint(s)
+
+    return instances
 
 
 main()
+#list_roles()
+

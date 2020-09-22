@@ -40,6 +40,7 @@ def repackage_instances(instances):
         id = i["InstanceId"]
         tags = {}
         tags["InstanceType"] = i["InstanceType"]
+        tags["IamRole"] = i["IamInstanceProfile"]["Arn"].rpartition('/')[-1]
         for t in i["Tags"]:
             tags[t["Key"]] = t["Value"]
 
@@ -54,7 +55,7 @@ def create_amis(client, lst, name_prefix, DryRun=True, waitForCompletion = False
     res_lst = []
     amis = []
 
-    #pprint.pprint(lst)
+    pprint.pprint(lst)
     for elt in lst:
         tags = elt[1]
         description = tags["Name"]
@@ -97,7 +98,7 @@ def main(waitForCompletion = True):
                             vars["EcsQuarantineCopiedPrefix"],
                             waitForCompletion = waitForCompletion,
                             DryRun=False,
-                            NoReboot=True)
+                            NoReboot=False)
 
     with open('input/base_amis.txt', 'w') as outfile:
         json.dump(base_amis, outfile, indent=4)
