@@ -5,9 +5,9 @@ import json
 import time
 from botocore.exceptions import ClientError
 
-import awsutils
-import copy_target_images
-import launch_target_instances
+from src.utils import awsutils
+from src.ec2 import copy_target_images
+from src.ec2 import launch_target_instances
 
 
 copy_target_images.main(waitForCompletion = True)

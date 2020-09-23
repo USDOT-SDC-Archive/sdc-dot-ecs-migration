@@ -3,7 +3,7 @@ import pprint
 import boto3
 import json
 import time
-import awsutils
+from src.utils import awsutils
 from botocore.exceptions import ClientError
 
 

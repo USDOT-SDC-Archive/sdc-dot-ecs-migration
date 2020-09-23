@@ -5,10 +5,10 @@ import json
 import time
 from botocore.exceptions import ClientError
 
-import awsutils
-import create_images
-import copy_images
-import share_images
+from src.utils import awsutils
+from src.ec2 import create_images
+from src.ec2 import copy_images
+from src.ec2 import share_images
 
 
 create_images.main(waitForCompletion = True)

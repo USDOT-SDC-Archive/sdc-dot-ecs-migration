@@ -2,7 +2,7 @@ import logging
 import pprint
 import boto3
 import json
-import awsutils
+from src.utils import awsutils
 from botocore.exceptions import ClientError
 
 #logger = logging.getLogger(__name__)
