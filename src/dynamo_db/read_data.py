@@ -3,6 +3,9 @@ import boto3
 import json
 from botocore.exceptions import ClientError
 
+from src.utils import awsutils
+
+
 def get_src_users_instances_map():
     with open('input/src-users-instances-raw.txt') as f:
         lines = f.read().splitlines()
@@ -48,8 +51,9 @@ def prep_user_for_ecs(usr, s3map):
 
 
 def main():
+    vars = awsutils.read_vars()
     dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table('prod-UserStacksTable')
+    table = dynamodb.Table(vars['DynamoDBSourceStacks'])
 
     dct = get_src_users_instances_map()
 

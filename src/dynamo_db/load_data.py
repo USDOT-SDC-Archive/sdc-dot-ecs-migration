@@ -3,6 +3,8 @@ import boto3
 import json
 from botocore.exceptions import ClientError
 
+from src.utils import awsutils
+
 
 def map_s3_to_ecs_prod():
     with open('input/s3-map-raw.txt') as f:
@@ -54,8 +56,9 @@ def prep_user_for_ecs(usr, s3map, ec2map):
 
 
 def main():
+    vars = awsutils.read_vars()
     dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table('dev-ecs-UserStacksTable')
+    table = dynamodb.Table(vars['DynamoDBDestinationStacks'])
 
     with open('input/dest-user-stacks.txt') as infile:
         users = json.load(infile)
