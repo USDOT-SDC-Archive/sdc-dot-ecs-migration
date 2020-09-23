@@ -8,7 +8,18 @@ from botocore.exceptions import ClientError
 #logger = logging.getLogger(__name__)
 #ec2 = boto3.resource('ec2')
 
-def get_instances(client, instance_ids):
+def list_roles():
+    instances = main()
+
+    for i in instances:
+        tags = awsutils.get_instance_tags(i)
+        s = i["IamInstanceProfile"]["Arn"].rpartition('/')[-1]
+        pprint.pprint(s)
+
+    return instances
+
+
+def get_instances(client, instance_ids, Verbose=True):
     instances = client.describe_instances(InstanceIds=instance_ids)
 
     all = []
@@ -34,28 +45,17 @@ def repackage_instances_as_dct(instances):
     return dct
 
 
-def list_roles():
-    instances = main()
-
-    for i in instances:
-        tags = awsutils.get_instance_tags(i)
-        s = i["IamInstanceProfile"]["Arn"].rpartition('/')[-1]
-        pprint.pprint(s)
-
-    return instances
-
-
 # main
 def main():
     vars = awsutils.read_vars()
     client = awsutils.get_ec2_client('us-east-1')
 
-    instances_file = "input/" + vars["InstancesInputFile"]
+    instances_file = "../input/" + vars["InstancesInputFile"]
     with open(instances_file) as infile:
         instance_ids = json.load(infile)
 
     instances = get_instances(client, instance_ids)
-    pprint.pprint(instances)
+    #pprint.pprint(instances)
 
     for i in instances:
         tags = awsutils.get_instance_tags(i)
@@ -66,6 +66,6 @@ def main():
     return instances
 
 
-main()
-#list_roles()
+if __name__ == '__main__':
+    main()
 

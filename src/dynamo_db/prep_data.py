@@ -3,33 +3,7 @@ import boto3
 import json
 from botocore.exceptions import ClientError
 
-
-def map_s3_to_ecs_prod():
-    with open('input/s3-map-raw.txt') as f:
-        lines = f.read().splitlines()
-
-    dct = {}
-    for kv in lines:
-        k = kv.split()[0]
-        v = kv.split()[1]
-
-        dct[k] = v
-
-    return dct
-
-
-def map_ec2_to_ecs_prod():
-    with open('input/dynamo_target_ec2s.txt') as infile:
-        lst = json.load(infile)
-
-    dct = {}
-    for elt in lst:
-        k = elt[0]
-        v = elt[5]
-
-        dct[k] = v
-
-    return dct
+from src.utils import utils
 
 
 def prep_user_for_ecs(usr, s3map, ec2map):
@@ -54,8 +28,8 @@ def prep_user_for_ecs(usr, s3map, ec2map):
 
 
 def main():
-    s3map = map_s3_to_ecs_prod()
-    ec2map = map_ec2_to_ecs_prod()
+    s3map = utils.map_s3_to_ecs_prod()
+    ec2map = utils.map_ec2_to_ecs_prod()
 
     with open('input/src-user-stacks.txt') as infile:
         src_users = json.load(infile)

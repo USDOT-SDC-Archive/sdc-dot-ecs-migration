@@ -1,3 +1,5 @@
 /src/input/
 /src/dynamo_db/input/
+/src/ec2/input/
+/src/iam/input/
 /src/ps/input/
