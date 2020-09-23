@@ -52,7 +52,10 @@ def main():
                 )
 
                 policy_version = res['PolicyVersion']
-                doc = policy_version['Document']
+                doc = { 'Document': policy_version['Document'] }
+                if 'Description' in policy.keys():
+                    doc['Description'] = policy['Description']
+
                 #policy_version['CreateDate'] = ''
 
                 #pprint.pprint(policy_version)
