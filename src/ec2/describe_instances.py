@@ -44,6 +44,17 @@ def repackage_instances_as_dct(instances):
 
     return dct
 
+def get_launch_times(instances):
+    launch_times = ''
+    for i in instances:
+        tags = awsutils.get_instance_tags(i)
+        s = i["InstanceId"] + " --> " + tags["OS"] + " | " + i["PrivateIpAddress"] + \
+            " --> " + json.dumps(i["State"]["Name"])
+        pprint.pprint(s)
+        launch_times = launch_times + i["InstanceId"] + ' ' + str(i['LaunchTime']) + '\n'
+
+    return launch_times
+
 
 # main
 def main():
@@ -57,14 +68,7 @@ def main():
     instances = get_instances(client, instance_ids)
     pprint.pprint(instances)
 
-    launch_times = ''
-    for i in instances:
-        tags = awsutils.get_instance_tags(i)
-        s = i["InstanceId"] + " --> " + tags["OS"] + " | " + i["PrivateIpAddress"] + \
-            " --> " + json.dumps(i["State"]["Name"])
-        pprint.pprint(s)
-        launch_times = launch_times + i["InstanceId"] + ' ' + str(i['LaunchTime']) + '\n'
-
+    launch_times = get_launch_times(instances)
     pprint.pprint(launch_times)
 
     return instances
