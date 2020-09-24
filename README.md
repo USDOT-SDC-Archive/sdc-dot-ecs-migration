@@ -206,6 +206,16 @@ As a result of this execution, all corresponding policies and roles will be crea
 
 Automation is in progress, but some steps will remain manual.
 
+**Everything below is for target environment only.
+
+##### Generate mRemoteNG import file for new instances
+
+1. Execute the command below. It will generate a BulkImport.xml file in the src/domain/input folder, which can be imported by mRemoteNG manager. src/domain/input folder should exist prior to execution.
+
+```
+python src/domain/prep_mng_import.py
+```
+
 Here's the outline of what remains after automated migration:
 
 - Fix local admin password expiration
