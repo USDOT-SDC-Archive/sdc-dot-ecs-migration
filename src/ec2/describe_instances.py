@@ -55,13 +55,17 @@ def main():
         instance_ids = json.load(infile)
 
     instances = get_instances(client, instance_ids)
-    #pprint.pprint(instances)
+    pprint.pprint(instances)
 
+    launch_times = ''
     for i in instances:
         tags = awsutils.get_instance_tags(i)
         s = i["InstanceId"] + " --> " + tags["OS"] + " | " + i["PrivateIpAddress"] + \
-            " --> " + json.dumps(i["State"]["Name"]) + " | "
+            " --> " + json.dumps(i["State"]["Name"])
         pprint.pprint(s)
+        launch_times = launch_times + i["InstanceId"] + ' ' + str(i['LaunchTime']) + '\n'
+
+    pprint.pprint(launch_times)
 
     return instances
 
