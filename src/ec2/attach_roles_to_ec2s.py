@@ -93,8 +93,8 @@ def main():
     for i in lst:
         instance_roles[i[5]] = i[1]['IamRole']
 
-    #instances = create_profiles(ec2client, iam_client, instance_roles)
-    #instances = attach_roles_to_profiles(ec2client, iam_client, instance_roles)
+    res = create_profiles(ec2client, iam_client, instance_roles)
+    res = attach_roles_to_profiles(ec2client, iam_client, instance_roles)
     res = attach_profiles_to_ec2s(ec2client, iam_client, instance_roles)
 
     # pprint.pprint(instances)
