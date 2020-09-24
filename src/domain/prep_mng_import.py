@@ -15,7 +15,7 @@ def build_import(instances, instance_ips, full_tpl, node_tpl):
     nodes = ''
     for i, elt in instances.items():
         name = elt['Owner']
-        description = elt['OS']
+        description = elt['Team'] + ' - ' + elt['OS']
         ip = instance_ips[i]
         node = node_tpl.replace('$NAME', name).replace('$DESCRIPTION', description).replace('$IP', ip)
         nodes = nodes + node + '\n'
