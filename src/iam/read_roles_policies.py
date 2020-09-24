@@ -39,9 +39,15 @@ def main():
         role_res = iam.get_role(RoleName = role)
         assumeRolePolicyDocument = role_res['Role']['AssumeRolePolicyDocument']
 
+        roleDescription = ''
+
+        if 'Description' in role_res['Role'].keys():
+            roleDescription = role_res['Role']['Description']
+
         res = iam.list_attached_role_policies(RoleName = role)
         attached_policies = res['AttachedPolicies']
         dct_role_policies[role] = { 'AssumeRolePolicyDocument': assumeRolePolicyDocument,
+                                    'Description': roleDescription,
                                     'AttachedPolicies': attached_policies }
 
         for p in attached_policies:
