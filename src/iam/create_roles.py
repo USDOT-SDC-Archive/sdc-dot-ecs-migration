@@ -8,48 +8,42 @@ from src.utils import awsutils
 from src.ec2 import describe_instances
 
 
-def create_policies(client, vars):
-    with open('input/dest-policies.txt') as infile:
+def create_roles(client, vars):
+    with open('input/dest-roles.txt') as infile:
         dct = json.load(infile)
 
-    res_policies = {}
-    for k, v in dct.items():
-        # TODO: move this replacement into prep_roles_policies.py
-        name = k.replace(vars['SourceRolePolicyPrefix'],
-                         vars['TargetRolePolicyPrefix'])
+    dct_new_roles = {}
+    for role_name, elt in dct.items():
+        new_role_name = role_name.replace(vars['SourceRolePolicyPrefix'],
+                                          vars['TargetRolePolicyPrefix'])
 
         try:
-            policyDocument = json.dumps(v['Document'])
-            description = ''
-            if 'Description' in v.keys():
-                description = v['Description']
+            res = client.create_role(RoleName=new_role_name,
+                                     Description=elt['Description'],
+                                     AssumeRolePolicyDocument=json.dumps(elt['AssumeRolePolicyDocument']))
 
-            #pprint.pprint(name + ' --> ' + description)
-            res = client.create_policy(PolicyName=name,
-                                       PolicyDocument=policyDocument,
-                                       Description=description)
+            dct_new_roles[new_role_name] = elt
 
-            res_policies[name] = res['Policy']
-            pprint.pprint(res['Policy'])
+            pprint.pprint(dct_new_roles[new_role_name])
 
         except ClientError as e:
             if e.response['Error']['Code'] == 'EntityAlreadyExists':
-                pprint.pprint('WARNING: policy already exists: ' + name)
+                pprint.pprint('WARNING: role already exists: ' + new_role_name)
             else:
                 raise e
 
-    return res_policies
+    return dct_new_roles
 
-
-def create_roles(client, vars):
-    return None
 
 def main():
     vars = awsutils.read_vars()
     iam = boto3.client('iam')
     res = create_roles(iam, vars)
 
-    #pprint.pprint(json.dumps(res), indent=4)
+    with open('input/created-roles.txt', 'w') as outfile:
+        outfile.write(json.dumps(res, indent=4))
+
+    #pprint.pprint(json.dumps(res, indent=4))
     
     return res
 
