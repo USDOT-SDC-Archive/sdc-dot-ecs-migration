@@ -36,10 +36,13 @@ def main():
     dct_policies = {}
 
     for role in roles:
-        #role_res = iam.get_role(RoleName = role)
+        role_res = iam.get_role(RoleName = role)
+        assumeRolePolicyDocument = role_res['Role']['AssumeRolePolicyDocument']
+
         res = iam.list_attached_role_policies(RoleName = role)
         attached_policies = res['AttachedPolicies']
-        dct_role_policies[role] = attached_policies
+        dct_role_policies[role] = { 'AssumeRolePolicyDocument': assumeRolePolicyDocument,
+                                    'AttachedPolicies': attached_policies }
 
         for p in attached_policies:
             if not p['PolicyName'] in dct_policies.keys():
