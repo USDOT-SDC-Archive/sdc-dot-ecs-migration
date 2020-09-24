@@ -6,7 +6,7 @@ from src.utils import awsutils
 from botocore.exceptions import ClientError
 
 
-def copy_target_amis(client, lst, KmsKeyId, waitForCompletion=False, DryRun=True):
+def copy_target_amis(client, vars, lst, KmsKeyId, waitForCompletion=False, DryRun=True):
 
     res_lst = []
     amis = []
@@ -17,7 +17,7 @@ def copy_target_amis(client, lst, KmsKeyId, waitForCompletion=False, DryRun=True
         description = tags["Name"]
         encrypted = True
         kms_key_id = KmsKeyId
-        name = "ECS_RESTORED " + " " + instance_id + " " + tags["Name"]
+        name = vars["EcsRestoredPrefix"] + " " + instance_id + " " + tags["Name"]
         source_image_id = elt[3]
         source_region = 'us-east-1'
 
@@ -53,6 +53,7 @@ def main(waitForCompletion = False):
     #pprint.pprint(vars['KmsKeyId'])
 
     copied_amis = copy_target_amis(client,
+                                   vars,
                                    lst,
                                    waitForCompletion = waitForCompletion,
                                    KmsKeyId=vars['TargetKmsKeyId'],
