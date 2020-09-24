@@ -26,10 +26,10 @@ This repository contains tools and documentation to aid with migration of the Se
 
 Requires:
 - aws cli version 2 or higher
-- Python version 5.3 or higher
+- Python version 3.5 or higher
 - Python boto3 library 
 
-The preferred environment for execution is Linux - but will work in Windows as well if you have corresponding utilities installed.
+Clone this repository twice: once for the source environment work and second time for the target environment work. Create "input" folders under each subfolder. Check .gitignore - those are the ones.
 
 <a name="usage"/>
 
@@ -52,7 +52,7 @@ All source code files are located into the "src" folder. Follow the steps below 
 
 ### Preparation
 
-1. Create "input" folder under the "src" folder.
+1. Create "src/input" folder..
 2. Create vars.txt file in the "src/input" folder. The file should define execution variables as follows:
 
 ```
@@ -63,10 +63,16 @@ All source code files are located into the "src" folder. Follow the steps below 
     "EcsRestoredPrefix": [prefix for AMI images and EC2 instances to add to AMIs and EC2s restored in the target account],
     "SourceKmsKeyId": [source account KMS key, shared with the target account],
     "TargetKmsKeyId": [target account KMS key to use],
+    "SourceAccount": [source AWS account nummber],
     "TargetAccount": [target AWS account number],
     "EC2KeyName": [target account key name for creating EC2 instances],
     "EC2SecurityGroupIds": [list of target account security groups to assign to EC2 instances],
-    "EC2SubnetId": [target account subnet ID to place EC2 instances]
+    "EC2SubnetId": [target account subnet ID to place EC2 instances],
+    "DynamoDBSourceStacks": [source account user stacks DynamoDB table name],
+    "DynamoDBDestinationStacks": [target account user stacks DynamoDB table name],
+    "SourceRolePolicyPrefix": [prefix of IAM policies and roles in the source account],
+    "TargetRolePolicyPrefix": [prefix in the target account. will replace source prefix when creating roles and policies]
+    
 }
 ```
 For example:
@@ -78,15 +84,21 @@ For example:
     "EcsRestoredPrefix": "ECS_RESTORED ",
     "SourceKmsKeyId": "alias/source-account-kms",
     "TargetKmsKeyId": "alias/target-account-kms",
-    "TargetAccount": "1234567890",
+    "SourceAccount": "1234567890",
+    "TargetAccount": "1234567899",
     "EC2KeyName": "target-account-ec2-creation-key",
     "EC2SecurityGroupIds": ["sg-1111", "sg-2222"],
-    "EC2SubnetId": "subnet-123abc"
+    "EC2SubnetId": "subnet-123abc",
+    "DynamoDBSourceStacks": "prod-user-stacks-table",
+    "DynamoDBDestinationStacks": "dev-user-stacks-table",
+    "SourceRolePolicyPrefix": "prod-",
+    "TargetRolePolicyPrefix": "dev-"
+
 }
 ```
 
-
-3. Create instances.txt file in the "src/input" folder. The file should contain json representation of a list of EC2 instances you want to migrate.
+3. Create "src/ec2/input" folder. Files in this folder will assist with AMI sharing and EC2 instance re-creation in the destination AWS account.
+4. Create instances.txt file in the "src/ec2/input" folder. The file should contain json representation of a list of EC2 instances you want to migrate.
 
 Example content:
 
@@ -100,48 +112,126 @@ Example content:
 
 ```
 
+4. Create "src/dynamo_db/input" folder. Files in this folder will be used for user stacks table generation. Also, will be used in IAM policy and role migration.
+5. Create "src/dynamo_db/input/s3-map-raw.txt" file. The file should contain mapping of source s3 bucket names to destination s3 bucket names. Each entry on a single line spearated by space. This list exists as a table in Confluence.
+
+Example:
+
+```
+src-bucket-foo-111 dest-bucket-foo-222
+src-bucket-bar-111 dest-bucket-bar-222
+src-bucket-ree-111 dest-bucket-ree-222
+
+```
+
+6. Create "src/dynamo_db/input/src-users-instances-raw.txt" file to contain user to source instance mapping, space-separated on a single line. Same user may have multiple entries.
+
+Example:
+
+```
+john i-111
+john i-222
+garry i-333
+susie i-444
+
+```
+Note: in the future, this will be the main file to define instances to migrate and the file from step 4 will be auto-generated, so if these instructions are out of date make sure you don't spend time creating the step 4 file unnecessarily. Though no harm in doing so.
+
+
 ### Execution with explanations
 
-**From the source environment**
+WARNING: all execution has been done from PyCharm environment. There may be some inconsistencies if running from a command line.
 
-1. Run the following command to verify that all instances are stopped:
+#### EC2 instance automated migration
+
+1. **In the source environment:** Run the following command to verify that all instances are stopped:
 
 ```
 python describe_instances.py
 ```
 
-2. Run the following command to create base AMIs for the desired instances to work with. This will create input/base_amis.txt file:
+2. **In the source environment:** Run the following command to duplicate and share base AMIs with the target account:
 
 ```
-python create_images.py
+python src/ec2/main_source.py
 ```
+Note: this is a long-running process. It does provide rudimentory progress updates.
 
-3. Run the following command to create copies of AMIs. The AMIs will be encrypted with the KMS key that's shared with the target account. This command will create input/base_amis.txt file.
+3. The previous command will auto-generate src/ec2/input/copied_amis.txt file. Transfer it into the same location under the **target** environment.
 
-```
-python copy_images.py
-```
-
-4. When the images are created (completed), run the following command to change their permissions and permissions of underlying snapshots to share with the target account:
+4. **In the target environment:** Run the following command to create EC2 instances. This is also long-running:
 
 ```
-python share_images.py
+python src/ec2/main_target.py
 ```
 
-**In the target environment**
-5. Download the repository, create "src/input" folder, copy over vars.txt and copied_images.txt
+Note: at this point your instances should exist in the target environment. Outstanding: DynamoDB stack table migration and IAM polocies and roles migration.
 
-6. Run the following command to copy images locally (creates input/copied_target_amis.txt)
+4. The previous command will auto-generate src/ec2/input/launched_target_ec2s.txt file. Transfer it into the same location under the **source** environment. Also, create src/dynamo_db/input/dynamo_target_ec2s.txt file in the **source** environment and copy/paste content of launched_target_ec2s.txt into that new file as well.
 
-```
-python copy_target_images.py
-```
-
-7. Run the following command to finally) launch instances in the target account:
+5. **In the source environment:** execute these commands:
 
 ```
-python launch_target_instances.py
+python src/dynamo_db/read_data.py
+python src/dynamo_db/prep_data.py
 ```
+
+6. This will generate src/dynamo_db/input/dest-user-stacks.txt. Copy this file into the same location in the **target** environment.
+
+7. **In the target environment:** make sure DynamoDB stacks table exists. Execute
+
+```
+python src/dynamo_db/create_data.py
+```
+
+After this, DynamoDB user stacks table should be populated. Now it's just policies and roles for EC2 instances.
+
+8. **In the source environment:** Execute
+
+```
+python src/iam/main_source.py
+```
+
+9. This will generate src/iam/input/dest-policies.txt and dest-roles.txt. Copy these files into the same location in the **target** environment.
+
+10. **In the target environment:** Execute
+
+```
+python src/iam/main_target.py
+```
+
+As a result of this execution, all corresponding policies and roles will be created and attached to migrated instances.
+
+#### Configuration in the target environment
+
+Automation is in progress, but some steps will remain manual.
+
+Here's the outline of what remains after automated migration:
+
+- Fix local admin password expiration
+- fix network/domains
+- Add original User to Administrators group
+- Run this script on migrated Windows machines: C:\ProgramData\Amazon\EC2-Windows\Launch\Scripts\InitializeInstance.ps1
+- Add workstations to guacamole in guacamole settings
+- Create guacamole users to map AD - make sure to allow both machines AND groups
+- USER PROFILES (copy folders from orig to new user folders)
+- Confirm SQL Workbench connects to Hadoop
+- Disable clipboard on machines
+--- https://automationadmin.com/2016/05/gpo-disable-clipboard-in-rdp/
+
+
+- for SQL Server machine: re-add new users.
+
+- for linux - fix hostname (
+Jupyter:
+- /etc/dhcpd.conf/dhclient.conf
+- fix hostname
+--- Amazon Linux v1: hostname: /etc/sysconfig/network
+- fixDNSresolution
+--- add itself to hosts file
+--- something manual by Robert on DNS server to allow name resolution for new machines
+------ opening a ticket with Amazon to learn why not self-registering
+
 
 <a name="version_history"/>
 
