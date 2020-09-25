@@ -30,6 +30,7 @@ def prep_user_for_ecs(usr, s3map, ec2map):
 def main():
     s3map = utils.map_s3_to_ecs_prod()
     ec2map = utils.map_ec2_to_ecs_prod()
+    #ec2map = utils.map_ec2_to_ecs_prod_simple()
 
     with open('input/src-user-stacks.txt') as infile:
         src_users = json.load(infile)
