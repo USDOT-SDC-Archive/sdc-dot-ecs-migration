@@ -44,6 +44,9 @@ def repackage_instances(instances):
         for t in i["Tags"]:
             tags[t["Key"]] = t["Value"]
 
+        if not 'Action' in tags.keys():
+            tags['Action'] = 'Stop'
+
         elt = (id, tags)
         lst.append(elt)
 
