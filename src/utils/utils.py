@@ -68,3 +68,9 @@ def map_ec2_to_ecs_prod():
 
     return dct
 
+def map_ec2_to_ecs_prod_simple():
+    with open('../dynamo_db/input/simple_target_ec2s.txt') as infile:
+        lst = json.load(infile)
+
+    return lst
+
