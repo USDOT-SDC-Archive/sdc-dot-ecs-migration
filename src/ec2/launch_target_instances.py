@@ -71,4 +71,5 @@ def main():
     pprint.pprint("Leaving launch_target_instances.main()")
 
 
-#main()
+if __name__ == '__main__':
+    main()

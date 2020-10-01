@@ -22,6 +22,16 @@ def attach_role_policies(client, vars, dct):
             except ClientError as e:
                 raise e
 
+        samba_share_policy_arn = vars['SambaSharePolicy']
+        try:
+            res = client.attach_role_policy(RoleName=role_name,
+                                            PolicyArn=samba_share_policy_arn)
+
+            pprint.pprint(res)
+
+        except ClientError as e:
+            raise e
+
     return dct
 
 
