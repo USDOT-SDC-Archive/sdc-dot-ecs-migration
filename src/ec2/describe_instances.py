@@ -61,7 +61,7 @@ def main():
     vars = awsutils.read_vars()
     client = awsutils.get_ec2_client('us-east-1')
 
-    instances_file = "../input/" + vars["InstancesInputFile"]
+    instances_file = "input/" + vars["InstancesInputFile"]
     with open(instances_file) as infile:
         instance_ids = json.load(infile)
 
