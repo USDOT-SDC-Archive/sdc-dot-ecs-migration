@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mrng:Connections xmlns:mrng="http://mremoteng.org" Name="Connections" Export="false" EncryptionEngine="AES" BlockCipherMode="GCM" KdfIterations="1000" FullFileEncryption="false" Protected="VtwSwgP6sUb9tR+vJoPEpTSk2gVQLxtxDIOLAdWz47wQKBVCD68XE4r5zKEcVa+bXomYxYvIaRjC4o75yJIfNhLe" ConfVersion="2.6">
+$NODES
+</mrng:Connections>
